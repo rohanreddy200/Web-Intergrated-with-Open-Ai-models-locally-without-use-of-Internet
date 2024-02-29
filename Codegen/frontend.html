@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline ChatGPT</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #chat-container {
+            margin-top: auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        #chat-history {
+            margin-bottom: 10px;
+        }
+
+        #user-input {
+            margin-bottom: 10px;
+        }
+        
+        #bg-container{
+            background-color: #0056b3;
+            height: 100vh;
+            width: 40px;    
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="chat-container">
+        <div id="chat-history"></div>
+        <input type="text" id="user-input" placeholder="Type your message..." style="width: calc(98% - 80px); padding: 10px; border-radius: 5px; border: 1px solid #ccc; text-align: center;">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            document.getElementById('chat-history').innerHTML += `<p>You: ${userInput}</p>`;
+
+            const response = await fetch('http://127.0.0.1:5000/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id: 'unique_user_id', user_input: userInput })
+            }).then(response => response.json());
+
+            document.getElementById('chat-history').innerHTML += `<p>ChatGPT: ${response.response}</p>`;
+        }
+    </script>
+</body>
+</html>
