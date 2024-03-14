@@ -16,14 +16,14 @@ model_path = model_tokenizer_directory  # Update the model path
 print("Loading model and tokenizer...")
 
 try:
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    tokenizer = AutoTokenizer.from_pretrained("Salesforce/codegen2-1B")
     print("Tokenizer loaded successfully!")
 except Exception as e:
     print("Error loading tokenizer:", e)
     raise
 
 try:
-    model = AutoModelForCausalLM.from_pretrained(model_path)
+    model = AutoModelForCausalLM.from_pretrained("Salesforce/codegen2-1B")
     print("Model loaded successfully!")
 except Exception as e:
     print("Error loading model:", e)
