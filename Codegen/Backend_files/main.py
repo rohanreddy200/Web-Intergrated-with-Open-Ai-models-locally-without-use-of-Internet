@@ -6,6 +6,9 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+app.static_folder='static'
 
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(
