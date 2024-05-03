@@ -1,0 +1,154 @@
+html, body {
+  height: 100%; /* Ensures the body takes up full viewport height */
+  margin: 0; /* Remove default margin */
+  overflow: hidden; /* Prevents scrolling on the page level */
+  font-family: 'Montserrat', sans-serif; /* Consistent font for the whole page */
+}
+
+.border {
+  display: flex;
+  align-items: center; /* Vertically center the content */
+  justify-content: space-between; /* Distribute space between elements */
+  background-color: black;
+  width: 100vw;
+  height: 10vh;
+  padding: 0 20px; /* Add padding on the sides */
+}
+.name {
+  color: white;
+  font-weight: bolder;
+  font-size: 25px;
+}
+/* 
+.logout-container {
+
+} */
+
+.logout-button {
+  padding: 8px 16px;
+  margin-right: 45px;
+  font-size: 16px;
+  background-color: #f44; /* Example background color */
+  color: white; /* Text color */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.logout-button:hover {
+  background-color: #c33; /* Darker background on hover */
+}
+.overall {
+  display: flex;
+  flex-direction: row;
+  height: 90vh; /* Adjusts height to take remaining viewport height */
+  width: 100vw;
+}
+
+.chat-history {
+  width: 30vw;
+  background-color: #87a3ec;
+  overflow-y: auto; /* Allows scrolling for chat history */
+  padding: 10px; /* Adds space inside the container */
+}
+
+.chat-history-name {
+ 
+  border-bottom: 2px solid #000; /* Adds a bottom border to the chat history title */
+  padding-bottom: 10px;
+  padding-top: 4px; 
+  padding-left: 150px;
+  margin-bottom: 10px; /* Space between title and dates */
+  color: #fff; /* Text color for contrast */
+  background-color: #456; /* Background color for the title area */
+}
+
+
+.chat-history-dates {
+  margin-bottom: 20px; /* Space between the dates list and the next section */
+  border: 2px solid #000; /* Border around the dates list */
+  padding: 10px; /* Padding inside the dates list container */
+  background-color: rgb(202, 214, 227); /* Background color for dates */
+  overflow-y: auto; /* Allows scrolling within the dates list if needed */
+  text-align: center;
+  cursor: pointer;
+  border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.3s; 
+}
+
+.chat-history-dates:hover{
+  background-color: rgb(174, 178, 186);
+}
+
+.chat-history-container {
+  flex-grow: 1;
+  overflow-y: auto; /* Scrolling enabled for the chat history messages */
+  border: 2px solid #000; /* Border around the chat history message area */
+  padding: 10px; /* Padding inside the message area */
+  background-color: #abc; /* Light background color for the message area */
+}
+
+.chat {
+  width: 70vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Aligns chat container and input area */
+  background-color: #FFF;
+}
+
+.chat-container {
+  flex-grow: 1;
+  overflow-y: auto; /* Allows scrolling within the chat container */
+  height: 85vh;
+  padding: 10px;
+  /* border: 2px solid #000;  */
+  background-color: #def; /* Light background color for readability */
+}
+
+.input-area {
+  padding: 10px;
+  background-color: #f8f8f8;
+  display: flex;
+  border-top: 2px solid #000; /* Separates input area with a top border */
+}
+
+.input-area input {
+  flex-grow: 1;
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.input-area button {
+  padding: 10px 20px;
+  background-color: #24a0ed;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.button:hover {
+  opacity: 0.8;
+}
+
+.message-entry p {
+  padding: 8px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  border: 1px solid #ccc; /* Adds a subtle border around each message */
+}
+
+.user-message p {
+  background-color: #f4f4ff;
+  text-align: right;
+  color: #0000ff;
+}
+
+.model-message p {
+  background-color: #e0ffe0;
+  text-align: left;
+  color: #008000;
+}

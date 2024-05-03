@@ -1,14 +1,18 @@
 import os
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer,GPT2Tokenizer, GPT2Model
 import logging
 import random
 
 # Set up basic logging to suppress INFO-level messages
 logging.basicConfig(level=logging.ERROR)
 
+# Check if GPU is available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Using device:", device)
+
 # Path to the directory containing the model and tokenizer files
-model_tokenizer_directory = r"C:\Users\Public\Codegen-350-mil"
+model_tokenizer_directory = r"C:\Users\Public\mistralai"
 
 # Verify and update the paths below based on the actual directory structure
 model_path = model_tokenizer_directory  # Update the model path
@@ -17,22 +21,23 @@ model_path = model_tokenizer_directory  # Update the model path
 print("Loading model and tokenizer...")
 
 try:
-    tokenizer = AutoTokenizer.from_pretrained("Salesforce/codegen-350M-multi")
+    tokenizer = GPT2Tokenizer.from_pretrained('gpt2-medium')
     print("Tokenizer loaded successfully!")
 except Exception as e:
     print("Error loading tokenizer:", e)
     raise
 
 try:
-    model = AutoModelForCausalLM.from_pretrained("Salesforce/codegen-350M-multi")
+    model = GPT2Model.from_pretrained('gpt2-medium')
     print("Model loaded successfully!")
 except Exception as e:
-    print("Error loading model:", e)
+    print("Detailed error loading model:", str(e))
     raise
 
+
 # Test model inference
-user_input = "write a code to multiply two numbers a and b in C++"
-input_ids = tokenizer.encode(user_input, return_tensors='pt', max_length=256, truncation=True)
+user_input = "write a code to print fibonacci series for a number n in C++"
+input_ids = tokenizer.encode(user_input, return_tensors='tf').input_ids.cuda()
 
 # Set generation parameters for accuracy and determinism
 max_length = 256  # Maximum length of the generated sequence
@@ -48,20 +53,11 @@ random.seed(42)
 torch.manual_seed(42)
 torch.cuda.manual_seed_all(42)
 
-with torch.no_grad():
-    output_ids = model.generate(
-        input_ids,
-        max_length=max_length,
-        num_return_sequences=1,
-        temperature=temperature,
-        top_k=top_k,
-        do_sample=True,
-        pad_token_id=tokenizer.eos_token_id,
-        num_beams=num_beams,
-        length_penalty=length_penalty,
-        no_repeat_ngram_size=no_repeat_ngram_size,
-        early_stopping=early_stopping,
-    )
+# with torch.no_grad():
+#     output_ids = model.generate(
+#         input_ids,
+#          temperature=0.7, do_sample=True, top_p=0.95, top_k=40, max_new_tokens=512
+#     ).to(device)
 
-response = tokenizer.decode(output_ids[0], skip_special_tokens=True)
+response = tokenizer.decode(input_ids)
 print("Response:", response)

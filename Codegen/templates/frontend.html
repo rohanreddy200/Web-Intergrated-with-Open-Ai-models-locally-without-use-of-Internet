@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <link rel="stylesheet" href="../static/frontend.css">
+</head>
+<body>
+    <div class="border">
+        <p class="name">Code Bot</p>    
+        <div class="logout-container">
+            <form action="/logout" method="post">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+        </div>
+    </div>
+    <div class="overall">
+        <div class="chat-history">
+            <div class="chat-container">
+                <div class="chat-history-name">
+                    <h1 class="name-chat">Chat History</h1>
+                </div>
+                <div  id="chat-history-dates">
+                    <!-- Dates will be loaded here -->
+                </div>
+            </div>
+        </div>
+        <div class="chat">
+            <div class="chat-container" id="chat-history">
+                <!-- Chat messages will be loaded here -->
+            </div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Type your message...">
+                <button class="button" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function getUserId() {
+                return "{{ user_id }}"; // This should use Jinja2 templating to inject the user ID, make sure the server-side rendering supports it.
+            }
+    
+            function loadChatHistory(date) {
+                const userId = getUserId();
+                const response = fetch(`http://127.0.0.1:5000/chat-history?user_id=${userId}&date=${date}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const chatHistory = data.chat_history;
+                        const mainChatContainer = document.getElementById('chat-history');
+                        mainChatContainer.innerHTML = ''; // Clear the current chat history
+                        chatHistory.forEach(entry => {
+                            if (entry.message_text.startsWith('User:')) {
+                                mainChatContainer.innerHTML += `<div class="message-entry user-message"><p><strong>You:</strong> ${entry.message_text.substring(6)}</p></div>`;
+                            } else if (entry.message_text.startsWith('CodeGPT:')) {
+                                mainChatContainer.innerHTML += `<div class="message-entry model-message"><p><strong>CodeGPT:</strong> ${entry.message_text.substring(8)}</p></div>`;
+                            }
+                        });
+                        mainChatContainer.scrollTop = mainChatContainer.scrollHeight; // Scroll to the bottom
+                    })
+                    .catch(error => console.error('Error loading chat history:', error));
+            }
+    
+            function loadChatDates() {
+                const userId = getUserId();
+                fetch(`http://127.0.0.1:5000/get-chat-dates?user_id=${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const datesContainer = document.getElementById('chat-history-dates');
+                        datesContainer.innerHTML = ''; // Clear existing entries
+                        data.chat_dates.forEach(date => {
+                            const dateElement = document.createElement('div');
+                            dateElement.className = 'chat-history-dates'; // Add a class for styling
+                            dateElement.innerText = date;
+                            dateElement.onclick = () => loadChatHistory(date);
+                            datesContainer.appendChild(dateElement);
+                        });
+                    })
+                    .catch(error => console.error('Error loading chat dates:', error));
+            }
+    
+            window.sendMessage = function() {
+                const userInput = document.getElementById('user-input').value;
+                if (!userInput.trim()) return; // Prevent sending empty messages
+                const userId = getUserId();
+                const mainChatContainer = document.getElementById('chat-history');
+                mainChatContainer.innerHTML += `<div class="message-entry user-message"><p><strong>You:</strong> ${userInput}</p></div>`;
+                fetch('http://127.0.0.1:5000/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user_id: userId, user_input: userInput })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const chatgptResponse = data.response.trim();
+                    mainChatContainer.innerHTML += `<div class="message-entry model-message"><p><strong>CodeGPT:</strong> ${chatgptResponse}</p></div>`;
+                    document.getElementById('user-input').value = ''; // Clear the input field
+                    mainChatContainer.scrollTop = mainChatContainer.scrollHeight; // Scroll to the bottom
+                })
+                .catch(error => console.error('Error sending message:', error));
+            };
+    
+            loadChatDates(); // Initial load of chat dates
+        });
+    </script>
+</body>
+</html>
