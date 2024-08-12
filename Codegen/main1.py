@@ -1,6 +1,6 @@
 import os
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer,GPT2Tokenizer, GPT2Model
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import logging
 import random
 
@@ -12,32 +12,39 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
 
 # Path to the directory containing the model and tokenizer files
-model_tokenizer_directory = r"C:\Users\Public\mistralai"
+model_tokenizer_directory = r"C:\Users\Public\New folder\mistral"
 
-# Verify and update the paths below based on the actual directory structure
-model_path = model_tokenizer_directory  # Update the model path
+# Ensure the latest versions of bitsandbytes and accelerate are installed
+try:
+    import bitsandbytes as bnb
+    from accelerate import Accelerator
+except ImportError as e:
+    raise ImportError("Please install accelerate and bitsandbytes: `pip install accelerate` and `pip install -i https://pypi.org/simple/ bitsandbytes`")
 
 # Load model and tokenizer
 print("Loading model and tokenizer...")
 
 try:
-    tokenizer = GPT2Tokenizer.from_pretrained('gpt2-medium')
+    tokenizer = AutoTokenizer.from_pretrained(model_tokenizer_directory)
     print("Tokenizer loaded successfully!")
 except Exception as e:
     print("Error loading tokenizer:", e)
     raise
 
 try:
-    model = GPT2Model.from_pretrained('gpt2-medium')
+    # Load the model without explicitly passing quantization_config if it's already present
+    model = AutoModelForCausalLM.from_pretrained(
+        model_tokenizer_directory,
+        low_cpu_mem_usage=True,  # Additional memory optimization
+    ).to(device)  # Move model to GPU
     print("Model loaded successfully!")
 except Exception as e:
     print("Detailed error loading model:", str(e))
     raise
 
-
 # Test model inference
 user_input = "write a code to print fibonacci series for a number n in C++"
-input_ids = tokenizer.encode(user_input, return_tensors='tf').input_ids.cuda()
+input_ids = tokenizer.encode(user_input, return_tensors='pt').to(device)  # Ensure tensor is on GPU
 
 # Set generation parameters for accuracy and determinism
 max_length = 256  # Maximum length of the generated sequence
@@ -53,11 +60,18 @@ random.seed(42)
 torch.manual_seed(42)
 torch.cuda.manual_seed_all(42)
 
-# with torch.no_grad():
-#     output_ids = model.generate(
-#         input_ids,
-#          temperature=0.7, do_sample=True, top_p=0.95, top_k=40, max_new_tokens=512
-#     ).to(device)
+with torch.no_grad():
+    output_ids = model.generate(
+        input_ids, 
+        do_sample=True, 
+        max_new_tokens=512,
+        num_beams=num_beams,
+        length_penalty=length_penalty,
+        temperature=temperature,
+        top_k=top_k,
+        no_repeat_ngram_size=no_repeat_ngram_size,
+        early_stopping=early_stopping  
+    )
 
-response = tokenizer.decode(input_ids)
+response = tokenizer.decode(output_ids[0], skip_special_tokens=True)
 print("Response:", response)

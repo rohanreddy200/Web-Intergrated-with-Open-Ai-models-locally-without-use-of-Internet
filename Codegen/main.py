@@ -143,7 +143,8 @@ def get_chat_history():
 
 @app.route('/get-chat-dates', methods=['GET'])
 @login_required
-def get_chat_dates():
+def get_chat_dates():   
+    
     user_id = session.get('user_id', None)
     cursor = conn.cursor()
     cursor.execute("SELECT DISTINCT DATE(timestamp) AS chat_date FROM codebot.chat_messages WHERE id=%s ORDER BY chat_date DESC", (user_id,))
